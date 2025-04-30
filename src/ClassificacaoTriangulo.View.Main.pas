@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
-  Vcl.Imaging.jpeg, System.ImageList, Vcl.ImgList, uConexao;
+  Vcl.Imaging.jpeg, System.ImageList, Vcl.ImgList, uConexao, Horse, Horse.Jhonson,
+  uServerMethods;
 
 type
   TfrmTriangulo = class(TForm)
@@ -34,11 +35,14 @@ implementation
 
 {$R *.dfm}
 
+
 procedure TfrmTriangulo.FormCreate(Sender: TObject);
 begin
-  DMConexao.Conectar;  // Conectar ao banco de dados
-  DMConexao.VerificarOuCriarTabela;  // Verificar e criar a tabela se necessário
+  DMConexao.Conectar;
+  DMConexao.VerificarOuCriarTabela;
+  StartServer;
 end;
+
 
 procedure TfrmTriangulo.btnVerificarClick(Sender: TObject);
 var

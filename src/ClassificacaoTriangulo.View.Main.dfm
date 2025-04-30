@@ -4,19 +4,20 @@ object frmTriangulo: TfrmTriangulo
   BorderIcons = [biSystemMenu]
   Caption = 'Classifica'#231#227'o Triangulo'
   ClientHeight = 498
-  ClientWidth = 624
+  ClientWidth = 584
   Color = clWindow
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OnCreate = FormCreate
   DesignSize = (
-    624
+    584
     498)
   TextHeight = 15
   object lblResultado: TLabel
-    Left = 212
+    Left = 192
     Top = 222
     Width = 200
     Height = 17
@@ -34,9 +35,10 @@ object frmTriangulo: TfrmTriangulo
     ParentColor = False
     ParentFont = False
     Layout = tlCenter
+    ExplicitLeft = 212
   end
   object imgTriangulo: TImage
-    Left = 212
+    Left = 192
     Top = 272
     Width = 200
     Height = 200
@@ -50,14 +52,14 @@ object frmTriangulo: TfrmTriangulo
     Caption = 'Lado A'
   end
   object lblLadoB: TLabel
-    Left = 291
+    Left = 275
     Top = 43
     Width = 36
     Height = 15
     Caption = 'Lado B'
   end
   object lblLadoC: TLabel
-    Left = 488
+    Left = 472
     Top = 43
     Width = 37
     Height = 15
@@ -66,26 +68,26 @@ object frmTriangulo: TfrmTriangulo
   object edtLadoA: TEdit
     Left = 40
     Top = 64
-    Width = 100
+    Width = 113
     Height = 23
     TabOrder = 0
   end
   object edtLadoB: TEdit
-    Left = 262
+    Left = 242
     Top = 64
     Width = 100
     Height = 23
     TabOrder = 1
   end
   object edtLadoC: TEdit
-    Left = 456
+    Left = 440
     Top = 64
     Width = 100
     Height = 23
     TabOrder = 2
   end
   object btnVerificar: TButton
-    Left = 212
+    Left = 192
     Top = 120
     Width = 200
     Height = 41

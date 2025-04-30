@@ -10,7 +10,6 @@ uses
   FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, FireDAC.Phys.PGDef, FireDAC.Phys.PG;
 
-
 type
   TDMConexao = class(TDataModule)
     FDConnection: TFDConnection;
@@ -32,11 +31,10 @@ implementation
 
 procedure TDMConexao.DataModuleCreate(Sender: TObject);
 begin
-  // Garante que o FDQuery exista e esteja vinculado
   if not Assigned(FDQuery) then
   begin
     FDQuery := TFDQuery.Create(Self);
-    FDQuery.Name := 'FDQuery'; // sem conflito de nomes
+    FDQuery.Name := 'FDQuery';
   end;
   FDQuery.Connection := FDConnection;
 
@@ -54,12 +52,12 @@ var
   Ini: TIniFile;
   Host, DB, Usuario, Senha: string;
 begin
-  Ini := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'config.ini');
+  Ini := TIniFile.Create(ExtractFilePath(ParamStr(0)) + 'connection.ini');
   try
     Host    := Ini.ReadString('BD', 'Host', 'localhost');
     DB      := Ini.ReadString('BD', 'Database', 'TRIANGULOS');
     Usuario := Ini.ReadString('BD', 'Usuario', 'postgres');
-    Senha   := Ini.ReadString('BD', 'Senha', 'Gutts@1120');
+    Senha   := Ini.ReadString('BD', 'Senha', '#abc123#');
   finally
     Ini.Free;
   end;
@@ -76,33 +74,39 @@ begin
 end;
 
 procedure TDMConexao.VerificarOuCriarTabela;
+var
+  lQuery: TFDQuery;
 begin
-  FDQuery.Connection := FDConnection;
+  lQuery := TFDQuery.Create(nil);
+  try
+    lQuery.Connection := FDConnection;
 
-  // Verifica existência da tabela 'triangulos'
-  FDQuery.SQL.Clear;
-  FDQuery.SQL.Add('SELECT EXISTS (');
-  FDQuery.SQL.Add('  SELECT 1 FROM information_schema.tables');
-  FDQuery.SQL.Add('  WHERE table_schema = ''public'' AND table_name = ''triangulos''');
-  FDQuery.SQL.Add(') AS existe;');
-  FDQuery.Open;
+    // Verifica existência da tabela 'triangulos'
+    lQuery.SQL.Text :=
+      'SELECT EXISTS (' +
+      '  SELECT 1 FROM information_schema.tables' +
+      '  WHERE table_schema = ''public'' AND table_name = ''triangulos''' +
+      ') AS existe;';
+    lQuery.Open;
 
-  if not FDQuery.FieldByName('existe').AsBoolean then
-  begin
-    FDQuery.Close;
-    FDQuery.SQL.Clear;
-    FDQuery.SQL.Add('CREATE TABLE triangulos (');
-    FDQuery.SQL.Add('  id SERIAL PRIMARY KEY,');
-    FDQuery.SQL.Add('  lado_a FLOAT,');
-    FDQuery.SQL.Add('  lado_b FLOAT,');
-    FDQuery.SQL.Add('  lado_c FLOAT,');
-    FDQuery.SQL.Add('  tipo VARCHAR(20),');
-    FDQuery.SQL.Add('  datahora TIMESTAMP');
-    FDQuery.SQL.Add(');');
-    FDQuery.ExecSQL;
+    if not lQuery.FieldByName('existe').AsBoolean then
+    begin
+      lQuery.Close;
+      lQuery.SQL.Text :=
+        'CREATE TABLE triangulos (' +
+        '  id SERIAL PRIMARY KEY,' +
+        '  lado_a FLOAT,' +
+        '  lado_b FLOAT,' +
+        '  lado_c FLOAT,' +
+        '  tipo VARCHAR(20),' +
+        '  datahora TIMESTAMP' +
+        ');';
+      lQuery.ExecSQL;
+    end;
+  finally
+    lQuery.Free;
   end;
 end;
 
 end.
-
 
