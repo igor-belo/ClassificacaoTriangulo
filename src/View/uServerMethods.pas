@@ -14,34 +14,6 @@ uses
   FireDAC.Comp.Client,
   uConexao;
 
-procedure ValidarTriangulo(json: TJSONObject; out a, b, c: Double; out tipo: string);
-begin
-  if not json.TryGetValue<Double>('lado_a', a) then
-    raise Exception.Create('Campo "lado_a" ausente ou inválido');
-  if not json.TryGetValue<Double>('lado_b', b) then
-    raise Exception.Create('Campo "lado_b" ausente ou inválido');
-  if not json.TryGetValue<Double>('lado_c', c) then
-    raise Exception.Create('Campo "lado_c" ausente ou inválido');
-  if not json.TryGetValue<string>('tipo', tipo) then
-    tipo := '';
-
-  if (a <= 0) or (b <= 0) or (c <= 0) then
-    raise Exception.Create('Os lados devem ser maiores que zero.');
-
-  if (a + b <= c) or (a + c <= b) or (b + c <= a) then
-    raise Exception.Create('Os lados não formam um triângulo válido.');
-
-  if tipo = '' then
-  begin
-    if (a = b) and (b = c) then
-      tipo := 'Equilátero'
-    else if (a = b) or (b = c) or (a = c) then
-      tipo := 'Isósceles'
-    else
-      tipo := 'Escaleno';
-  end;
-end;
-
 procedure PostTriangulo(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   a, b, c: Double;
@@ -53,14 +25,20 @@ begin
   try
     json := Req.Body<TJSONObject>;
 
-    ValidarTriangulo(json, a, b, c, tipo);
+    if not json.TryGetValue<Double>('lado_a', a) then
+      raise Exception.Create('Campo "lado_a" ausente ou inválido');
+    if not json.TryGetValue<Double>('lado_b', b) then
+      raise Exception.Create('Campo "lado_b" ausente ou inválido');
+    if not json.TryGetValue<Double>('lado_c', c) then
+      raise Exception.Create('Campo "lado_c" ausente ou inválido');
+    if not json.TryGetValue<string>('tipo', tipo) then
+      raise Exception.Create('Campo "tipo" ausente ou inválido');
     datahora := Now;
 
     q := TFDQuery.Create(nil);
     try
       q.Connection := DMConexao.FDConnection;
-      q.SQL.Text :=
-        'INSERT INTO triangulos (lado_a, lado_b, lado_c, tipo, datahora) ' +
+      q.SQL.Text := 'INSERT INTO triangulos (lado_a, lado_b, lado_c, tipo, datahora) ' +
         'VALUES (:a, :b, :c, :tipo, :datahora)';
       q.ParamByName('a').AsFloat := a;
       q.ParamByName('b').AsFloat := b;
@@ -69,21 +47,13 @@ begin
       q.ParamByName('datahora').AsDateTime := datahora;
       q.ExecSQL;
 
-      Res.Status(201).Send<TJSONObject>(TJSONObject.Create
-        .AddPair('lado_a', a.ToString)
-        .AddPair('lado_b', b.ToString)
-        .AddPair('lado_c', c.ToString)
-        .AddPair('tipo', tipo)
-        .AddPair('datahora', DateTimeToStr(datahora))
-      );
+      Res.Send<TJSONObject>(TJSONObject.Create.AddPair('mensagem', 'Triângulo registrado com sucesso'));
     finally
       q.Free;
     end;
   except
     on E: Exception do
-      Res.Status(400).Send<TJSONObject>(TJSONObject.Create
-        .AddPair('erro', E.Message)
-      );
+      Res.Status(400).Send<TJSONObject>(TJSONObject.Create.AddPair('erro', E.Message));
   end;
 end;
 
@@ -91,7 +61,6 @@ procedure GetContagemTriangulos(Req: THorseRequest; Res: THorseResponse; Next: T
 var
   q: TFDQuery;
   jsonResponse: TJSONObject;
-  totalGeral: Integer;
 begin
   q := TFDQuery.Create(nil);
   try
@@ -100,15 +69,11 @@ begin
     q.Open;
 
     jsonResponse := TJSONObject.Create;
-    totalGeral := 0;
-
     while not q.Eof do
     begin
       jsonResponse.AddPair(q.FieldByName('tipo').AsString, q.FieldByName('quantidade').AsString);
-      totalGeral := totalGeral + q.FieldByName('quantidade').AsInteger;
       q.Next;
     end;
-    jsonResponse.AddPair('total_geral', totalGeral.ToString);
 
     Res.Send<TJSONObject>(jsonResponse);
   finally
@@ -119,29 +84,28 @@ end;
 procedure GetRegistrosTriangulos(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   q: TFDQuery;
-  jsonResponse: TJSONArray;
-  registro: TJSONObject;
-  id, tipo: string;
-  data_inicio, data_fim: string;
+  jsonResponse, registro: TJSONArray;
+  id, tipo, data_inicio, data_fim: string;
   limit, offset: Integer;
-  pagina: Integer;
 begin
+  // Obtendo parâmetros da requisição
   id := Req.Query['id'];
   tipo := Req.Query['tipo'];
   data_inicio := Req.Query['data_inicio'];
   data_fim := Req.Query['data_fim'];
-  limit := 10;
-  pagina := StrToIntDef(Req.Query['pagina'], 1);
-  offset := limit * (pagina - 1);
+  limit := StrToIntDef(Req.Query['limit'], 10);  // Default 10 itens por página
+  offset := StrToIntDef(Req.Query['offset'], 0); // Default primeira página
 
+  // Preparando a query SQL com filtros
   q := TFDQuery.Create(nil);
   try
     q.Connection := DMConexao.FDConnection;
     q.SQL.Text := 'SELECT id, lado_a, lado_b, lado_c, tipo, datahora ' +
                   'FROM triangulos WHERE 1=1';
 
+    // Adicionando filtros
     if id <> '' then
-      q.SQL.Text := q.SQL.Text + ' AND id = :id::integer';
+      q.SQL.Text := q.SQL.Text + ' AND id = :id';
     if tipo <> '' then
       q.SQL.Text := q.SQL.Text + ' AND tipo = :tipo';
     if data_inicio <> '' then
@@ -149,8 +113,9 @@ begin
     if data_fim <> '' then
       q.SQL.Text := q.SQL.Text + ' AND datahora <= :data_fim';
 
-    q.SQL.Text := q.SQL.Text + ' ORDER BY id LIMIT :limit OFFSET :offset';
+    q.SQL.Text := q.SQL.Text + ' LIMIT :limit OFFSET :offset';
 
+    // Definindo parâmetros
     if id <> '' then
       q.ParamByName('id').AsString := id;
     if tipo <> '' then
@@ -165,14 +130,8 @@ begin
 
     q.Open;
 
+    // Criando o array de registros
     jsonResponse := TJSONArray.Create;
-
-    if q.RecordCount = 0 then
-    begin
-      Res.Send<TJSONObject>(TJSONObject.Create.AddPair('erro', 'Nenhum registro encontrado.'));
-      Exit;
-    end;
-
     while not q.Eof do
     begin
       registro := TJSONObject.Create;
@@ -182,11 +141,12 @@ begin
       registro.AddPair('lado_c', q.FieldByName('lado_c').AsString);
       registro.AddPair('tipo', q.FieldByName('tipo').AsString);
       registro.AddPair('datahora', DateTimeToStr(q.FieldByName('datahora').AsDateTime));
-      jsonResponse.Add(registro);
 
+      jsonResponse.Add(registro);
       q.Next;
     end;
-    Res.Send<TJSONArray>(jsonResponse);
+
+    Res.Send<TJSONArray>(jsonResponse);  // Envia os registros no formato JSON
   finally
     q.Free;
   end;
@@ -195,10 +155,13 @@ end;
 procedure StartServer;
 begin
   THorse.Use(Jhonson);
-  THorse.Post('/triangulos', PostTriangulo);
-  THorse.Get('/contagem', GetContagemTriangulos);
-  THorse.Get('/triangulos', GetRegistrosTriangulos);
-  THorse.Listen(9000);
+
+  // Definindo as rotas
+  THorse.Post('/triangulos', PostTriangulo);  // Rota para registrar triângulos
+  THorse.Get('/contagem', GetContagemTriangulos);  // Rota para contar triângulos por tipo
+  THorse.Get('/triangulos', GetRegistrosTriangulos);  // Rota para listar registros de triângulos
+
+  THorse.Listen(9000);  // Escutando na porta 9000
 end;
 
 end.

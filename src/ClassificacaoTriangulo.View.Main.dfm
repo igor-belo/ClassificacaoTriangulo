@@ -11,6 +11,7 @@ object frmTriangulo: TfrmTriangulo
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  StyleName = 'Windows10 SlateGray'
   OnCreate = FormCreate
   DesignSize = (
     584

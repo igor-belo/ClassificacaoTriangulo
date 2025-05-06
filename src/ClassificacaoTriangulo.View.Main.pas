@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.ExtCtrls, Vcl.StdCtrls,
   Vcl.Imaging.jpeg, System.ImageList, Vcl.ImgList, uConexao, Horse, Horse.Jhonson,
-  uServerMethods;
+  uServerMethods, IdHTTP, System.JSON;
 
 type
   TfrmTriangulo = class(TForm)
@@ -35,7 +35,6 @@ implementation
 
 {$R *.dfm}
 
-
 procedure TfrmTriangulo.FormCreate(Sender: TObject);
 begin
   DMConexao.Conectar;
@@ -43,13 +42,17 @@ begin
   StartServer;
 end;
 
-
 procedure TfrmTriangulo.btnVerificarClick(Sender: TObject);
 var
   a, b, c: Double;
   tipo: String;
   indiceImagem: Integer;
   bmp: TBitmap;
+  httpClient: TIdHTTP;
+  jsonReq, jsonResp: TJSONObject;
+  resposta: string;
+  url: String;
+  stringStream: TStringStream;
 begin
   a := StrToFloatDef(edtLadoA.Text, 0);
   b := StrToFloatDef(edtLadoB.Text, 0);
@@ -89,7 +92,6 @@ begin
   end;
 
   lblResultado.Caption := tipo;
-
   bmp := TBitmap.Create;
   try
     ImageList1.GetBitmap(indiceImagem, bmp);
@@ -97,7 +99,38 @@ begin
   finally
     bmp.Free;
   end;
+
+  // Montando o objeto JSON para enviar
+  jsonReq := TJSONObject.Create;
+  try
+    jsonReq.AddPair('lado_a', TJSONNumber.Create(a));
+    jsonReq.AddPair('lado_b', TJSONNumber.Create(b));
+    jsonReq.AddPair('lado_c', TJSONNumber.Create(c));
+    jsonReq.AddPair('tipo', tipo);
+
+    // URL do servidor
+    url := 'http://localhost:9000/triangulos';
+
+    httpClient := TIdHTTP.Create(nil);
+    try
+      httpClient.Request.ContentType := 'application/json';
+      httpClient.Request.Accept := 'application/json';
+      stringStream := TStringStream.Create(jsonReq.ToString, TEncoding.UTF8);
+
+      try
+        // Enviar a requisição
+        resposta := httpClient.Post(url, stringStream);
+      finally
+        stringStream.Free;
+      end;
+    finally
+      httpClient.Free;
+    end;
+  finally
+    jsonReq.Free;
+  end;
 end;
+
 
 end.
 
