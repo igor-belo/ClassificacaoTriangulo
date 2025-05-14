@@ -53,8 +53,8 @@ Este arquivo contém:
 [BD]
 Host=localhost
 Database=TRIANGULOS
-Usuario=postgres
-Senha=#abc123#
+Usuario=[Usuário do postgres]
+Senha=[Senha do usuário do postgres]
 ```
 
 >  Se o banco de dados não existir, o sistema perguntará se deseja criá-lo automaticamente.
