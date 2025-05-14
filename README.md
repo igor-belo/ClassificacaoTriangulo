@@ -1,10 +1,10 @@
-# 🧠 Classificação de Triângulos - API Delphi + Horse
+# Classificação de Triângulos - API Delphi + Horse
 
 Este projeto é uma aplicação REST desenvolvida com **Delphi + Horse + FireDAC**, com o objetivo de classificar triângulos a partir de três lados informados. A API também registra os dados em um banco de dados PostgreSQL e conta com **testes automatizados**.
 
 ---
 
-## 🎯 Finalidade
+## Finalidade
 
 A aplicação recebe os lados de um triângulo, valida se eles formam um triângulo válido e classifica como:
 
@@ -17,7 +17,7 @@ Todos os registros (inclusive inválidos) são salvos no banco de dados com o ti
 
 ---
 
-## 🧪 Testes automatizados
+## Testes automatizados
 
 Os testes utilizam **DUnit** e estão organizados em units separadas por categoria (`Post`, `Get`, `Configuração`). Ao executar os testes, um log completo é salvo no arquivo:
 
@@ -33,7 +33,7 @@ Este arquivo contém:
 
 ---
 
-## 🔧 Requisitos
+## Requisitos
 
 - Delphi 10+ (usando FireDAC)
 - PostgreSQL (porta padrão: `5432`)
@@ -42,11 +42,9 @@ Este arquivo contém:
   - [`Horse.Jhonson`](https://github.com/HashLoad/horse-jhonson) (para JSON)
   - FireDAC
 
-  Obs: Instalador do executável disponível na pasta "Instalador"
-
 ---
 
-## 📦 Instalação e configuração
+## Instalação e configuração
 
 1. Clone este repositório.
 2. Configure o arquivo `connection.ini` na pasta do executável com os dados do PostgreSQL:
@@ -58,14 +56,14 @@ Database=TRIANGULOS
 Usuario=postgres
 Senha=#abc123#
 ```
-
-> 💡 Se o banco de dados não existir, o sistema perguntará se deseja criá-lo automaticamente.
+>  Instalador do executável disponível na pasta "Instalador"
+>  Se o banco de dados não existir, o sistema perguntará se deseja criá-lo automaticamente.
 
 3. Compile e execute a aplicação Delphi principal (`ClassificacaoTriangulo.dpr`).
 
 ---
 
-## 🚀 Rotas da API
+## Rotas da API
 
 ### 🔹 `POST /triangulos`
 
@@ -132,7 +130,7 @@ Retorna a contagem de triângulos por tipo.
 
 ---
 
-## ✅ Executar testes
+## Executar testes
 
 1. Na interface principal, clique em **Executar Testes**.
 2. Um arquivo chamado `tests_results.txt` será gerado na pasta do executável com todos os resultados.
@@ -141,8 +139,7 @@ Retorna a contagem de triângulos por tipo.
 
 ##  Autor
 
-**Igor Belo - Desenvolvedor Delphi/Python**  
-Colaboração com ChatGPT ✨
+**Igor Belo - Desenvolvedor Delphi/Python** 
 
 ---
 
