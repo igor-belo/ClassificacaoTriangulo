@@ -6,7 +6,8 @@ object DMConexao: TDMConexao
     Top = 208
   end
   object FDPhysPgDriverLink: TFDPhysPgDriverLink
-    Left = 360
+    OnDriverCreated = FDPhysPgDriverLinkDriverCreated
+    Left = 312
     Top = 212
   end
 end

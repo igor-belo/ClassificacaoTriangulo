@@ -17,6 +17,24 @@ uses
   FireDAC.Comp.Client,
   uConexao;
 
+function RemoverAcentos(const Texto: string): string;
+const
+  ComAcento = 'ÁÀÂÃÉÈÊÍÌÎÓÒÔÕÚÙÛÇáàâãéèêíìîóòôõúùûç';
+  SemAcento = 'AAAAEEEIIIOOOOUUUCaaaaeeeiiioooouuuc';
+var
+  i, j: Integer;
+  c: Char;
+begin
+  Result := Texto;
+  for i := 1 to Length(Result) do
+  begin
+    c := Result[i];
+    j := Pos(c, ComAcento);
+    if j > 0 then
+      Result[i] := SemAcento[j];
+  end;
+end;
+
 procedure ValidarTriangulo(json: TJSONObject; out a, b, c: Double; out tipo: string);
 begin
   if not json.TryGetValue<Double>('lado_a', a) then
@@ -32,7 +50,10 @@ begin
     raise Exception.Create('Os lados devem ser maiores que zero.');
 
   if (a + b <= c) or (a + c <= b) or (b + c <= a) then
-    raise Exception.Create('Os lados não formam um triângulo válido.');
+  begin
+    tipo := 'Invalido';
+    Exit;
+  end;
 
   if tipo = '' then
   begin
@@ -48,7 +69,7 @@ end;
 procedure PostTriangulo(Req: THorseRequest; Res: THorseResponse; Next: TProc);
 var
   a, b, c: Double;
-  tipo: string;
+  tipo, tipoSemAcento: string;
   datahora: TDateTime;
   q: TFDQuery;
   json: TJSONObject;
@@ -57,6 +78,7 @@ begin
     json := Req.Body<TJSONObject>;
 
     ValidarTriangulo(json, a, b, c, tipo);
+    tipoSemAcento := RemoverAcentos(tipo);
     datahora := Now;
 
     q := TFDQuery.Create(nil);
@@ -68,7 +90,7 @@ begin
       q.ParamByName('a').AsFloat := a;
       q.ParamByName('b').AsFloat := b;
       q.ParamByName('c').AsFloat := c;
-      q.ParamByName('tipo').AsString := tipo;
+      q.ParamByName('tipo').AsString := tipoSemAcento;
       q.ParamByName('datahora').AsDateTime := datahora;
       q.ExecSQL;
 

@@ -1,5 +1,5 @@
 ----------------------------------------
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 Nome do teste: TestarEquilatero
 Tipo: POST
 Rota: /triangulos
@@ -14,7 +14,7 @@ Resultado esperado: Equilátero
 Resultado obtido: Equilátero
 
 ----------------------------------------
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 Nome do teste: TestarEscaleno
 Tipo: POST
 Rota: /triangulos
@@ -29,7 +29,7 @@ Resultado esperado: Escaleno
 Resultado obtido: Escaleno
 
 ----------------------------------------
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 Nome do teste: TestarLadosInvalidos
 Tipo: POST
 Rota: /triangulos
@@ -40,11 +40,11 @@ JSON:
   "lado_c": "50"
 }
 
-Resultado esperado: Erro: lados inválidos
-Resultado obtido: Os lados não formam um triângulo válido.
+Resultado esperado: Invalido
+Resultado obtido: Invalido
 
 ----------------------------------------
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 Nome do teste: TestarConexao
 Tipo: CONFIG
 Rota: Conexão ao banco
@@ -55,7 +55,7 @@ Resultado esperado: Conexão bem-sucedida
 Resultado obtido: Conexão bem-sucedida
 
 ----------------------------------------
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 Nome do teste: TestarSimulacaoConsulta
 Tipo: GET
 Rota: /triangulos
@@ -73,7 +73,7 @@ Resultado obtido: Consulta simulada de 1 registro
 
 ========================================
 Resumo dos Testes
-Data/Hora: 12/05/2025 15:25:42
+Data/Hora: 13/05/2025 17:19:43
 ----------------------------------------
 Total de testes: 5
 Falhas: 0

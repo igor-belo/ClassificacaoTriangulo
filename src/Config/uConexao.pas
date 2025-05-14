@@ -9,18 +9,15 @@ uses
   FireDAC.UI.Intf, FireDAC.Phys.Intf, FireDAC.Stan.Def,
   FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys,
   FireDAC.VCLUI.Wait, FireDAC.Phys.PGDef, FireDAC.Phys.PG,
-
-
-  Vcl.Forms,
-  Vcl.Controls,
-  Vcl.Dialogs;
+  Vcl.Forms, Vcl.Controls, Vcl.Dialogs;
 
 type
   TDMConexao = class(TDataModule)
     FDConnection: TFDConnection;
     FDPhysPgDriverLink: TFDPhysPgDriverLink;
-    FDQuery: TFDQuery;
     procedure DataModuleCreate(Sender: TObject);
+    procedure FDPhysPgDriverLinkDriverCreated
+    (Sender: TObject);
   public
     procedure Conectar;
     procedure VerificarOuCriarTabela;
@@ -31,11 +28,9 @@ var
 
 implementation
 
-
-
 {%CLASSGROUP 'Vcl.Controls.TControl'}
 {$R *.dfm}
-{$SCOPEDENUMS OFF} // permite usar mrYes diretamente
+{$SCOPEDENUMS OFF}
 
 procedure TDMConexao.DataModuleCreate(Sender: TObject);
 begin
@@ -59,6 +54,22 @@ var
   QryCheck: TFDQuery;
 begin
   CaminhoIni := ExtractFilePath(ParamStr(0)) + 'connection.ini';
+
+  // Cria arquivo .ini padrão se não existir
+  if not FileExists(CaminhoIni) then
+  begin
+    Ini := TIniFile.Create(CaminhoIni);
+    try
+      Ini.WriteString('BD', 'Host', 'localhost');
+      Ini.WriteString('BD', 'Database', 'DB_TRIANGULO');
+      Ini.WriteString('BD', 'Usuario', 'postgres');
+      Ini.WriteString('BD', 'Senha', '#abc123#');
+    finally
+      Ini.Free;
+    end;
+  end;
+
+  // Lê configurações
   Ini := TIniFile.Create(CaminhoIni);
   try
     Host    := Ini.ReadString('BD', 'Host', 'localhost');
@@ -69,21 +80,20 @@ begin
     Ini.Free;
   end;
 
-  // Etapa 1: conectar ao banco 'postgres' pra checar se o banco existe
+  // Verifica se o banco existe
   ConnTemp := TFDConnection.Create(nil);
   QryCheck := TFDQuery.Create(nil);
   try
     ConnTemp.DriverName := 'PG';
     ConnTemp.Params.Add('Server=' + Host);
-    ConnTemp.Params.Add('Database=postgres'); // banco base garantido
+    ConnTemp.Params.Add('Database=postgres');
     ConnTemp.Params.Add('User_Name=' + Usuario);
     ConnTemp.Params.Add('Password=' + Senha);
     ConnTemp.Params.Add('Port=5432');
     ConnTemp.Connected := True;
 
     QryCheck.Connection := ConnTemp;
-    QryCheck.SQL.Text :=
-      'SELECT 1 FROM pg_database WHERE datname = :dbname';
+    QryCheck.SQL.Text := 'SELECT 1 FROM pg_database WHERE datname = :dbname';
     QryCheck.ParamByName('dbname').AsString := DB;
     QryCheck.Open;
 
@@ -109,7 +119,7 @@ begin
     ConnTemp.Free;
   end;
 
-  // Etapa 2: conectar ao banco final normalmente
+  // Conecta ao banco final
   FDConnection.Close;
   FDConnection.Params.Clear;
   FDConnection.DriverName := 'PG';
@@ -120,7 +130,6 @@ begin
   FDConnection.Params.Add('Port=5432');
   FDConnection.Connected := True;
 end;
-
 
 procedure TDMConexao.VerificarOuCriarTabela;
 var

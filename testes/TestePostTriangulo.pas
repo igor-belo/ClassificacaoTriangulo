@@ -64,25 +64,19 @@ procedure TTestPostTriangulo.TestarLadosInvalidos;
 var
   json: TJSONObject;
   a, b, c: Double;
-  tipo, esperado, erro: string;
+  tipo, esperado: string;
 begin
   json := TJSONObject.Create;
   try
     json.AddPair('lado_a', '1');
     json.AddPair('lado_b', '2');
     json.AddPair('lado_c', '50');
-    esperado := 'Erro: lados inválidos';
+    esperado := 'Invalido';
 
-    try
-      ValidarTriangulo(json, a, b, c, tipo);
-      erro := 'Não gerou exceção';
-    except
-      on E: Exception do
-        erro := E.Message;
-    end;
+    ValidarTriangulo(json, a, b, c, tipo);
 
-    LogResultadoDetalhado('TestarLadosInvalidos', 'POST', '/triangulos', json, esperado, erro);
-    Check(Pos('não formam um triângulo válido', erro) > 0);
+    LogResultadoDetalhado('TestarLadosInvalidos', 'POST', '/triangulos', json, esperado, tipo);
+    CheckEquals(esperado, tipo);
   finally
     json.Free;
   end;

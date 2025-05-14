@@ -3,8 +3,8 @@ object frmTriangulo: TfrmTriangulo
   Top = 0
   BorderIcons = [biSystemMenu]
   Caption = 'Classifica'#231#227'o Triangulo'
-  ClientHeight = 571
-  ClientWidth = 641
+  ClientHeight = 575
+  ClientWidth = 648
   Color = clWindow
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,11 +15,11 @@ object frmTriangulo: TfrmTriangulo
   StyleName = 'Windows10 SlateGray'
   OnCreate = FormCreate
   DesignSize = (
-    641
-    571)
+    648
+    575)
   TextHeight = 15
   object lblResultado: TLabel
-    Left = 172
+    Left = 175
     Top = 198
     Width = 300
     Height = 17
@@ -37,6 +37,7 @@ object frmTriangulo: TfrmTriangulo
     ParentColor = False
     ParentFont = False
     Layout = tlCenter
+    ExplicitLeft = 172
   end
   object imgTriangulo: TImage
     Left = 220
@@ -144,11 +145,11 @@ object frmTriangulo: TfrmTriangulo
     OnClick = btnVerificarClick
   end
   object btnTestes: TButton
-    Left = 552
+    Left = 536
     Top = 537
-    Width = 75
+    Width = 91
     Height = 25
-    Caption = 'Rodar Testes'
+    Caption = 'Executar Testes'
     TabOrder = 4
     OnClick = btnTestesClick
   end
