@@ -56,7 +56,7 @@ Database=TRIANGULOS
 Usuario=postgres
 Senha=#abc123#
 ```
->  Instalador do executável disponível na pasta "Instalador"
+
 >  Se o banco de dados não existir, o sistema perguntará se deseja criá-lo automaticamente.
 
 3. Compile e execute a aplicação Delphi principal (`ClassificacaoTriangulo.dpr`).
