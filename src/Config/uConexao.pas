@@ -16,7 +16,6 @@ type
     FDConnection: TFDConnection;
     FDPhysPgDriverLink: TFDPhysPgDriverLink;
     procedure DataModuleCreate(Sender: TObject);
-    procedure FDPhysPgDriverLinkDriverCreated
     (Sender: TObject);
   public
     procedure Conectar;
@@ -34,14 +33,12 @@ implementation
 
 procedure TDMConexao.DataModuleCreate(Sender: TObject);
 begin
-  FDQuery.Connection := FDConnection;
-
   try
     Conectar;
     VerificarOuCriarTabela;
   except
     on E: Exception do
-      ShowMessage('Erro ao inicializar conex„o/tabela: ' + E.Message);
+      ShowMessage('Erro ao inicializar conex√£o/tabela: ' + E.Message);
   end;
 end;
 
@@ -55,7 +52,7 @@ var
 begin
   CaminhoIni := ExtractFilePath(ParamStr(0)) + 'connection.ini';
 
-  // Cria arquivo .ini padr„o se n„o existir
+  // Cria arquivo .ini padr√£o se n√£o existir
   if not FileExists(CaminhoIni) then
   begin
     Ini := TIniFile.Create(CaminhoIni);
@@ -69,7 +66,7 @@ begin
     end;
   end;
 
-  // LÍ configuraÁıes
+  // L√™ configura√ß√µes
   Ini := TIniFile.Create(CaminhoIni);
   try
     Host    := Ini.ReadString('BD', 'Host', 'localhost');
@@ -103,7 +100,7 @@ begin
     if not ExisteDB then
     begin
       CriarDB := MessageDlg(
-        'O banco de dados "' + DB + '" n„o foi encontrado. Deseja cri·-lo agora?',
+        'O banco de dados "' + DB + '" n√£o foi encontrado. Deseja cri√°-lo agora?',
         mtConfirmation, [mbYes, mbNo], 0) = mrYes;
 
       if CriarDB then
@@ -112,7 +109,7 @@ begin
         ShowMessage('Banco de dados "' + DB + '" criado com sucesso!');
       end
       else
-        raise Exception.Create('Conex„o cancelada pelo usu·rio.');
+        raise Exception.Create('Conex√£o cancelada pelo usu√°rio.');
     end;
   finally
     QryCheck.Free;
